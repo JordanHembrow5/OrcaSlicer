@@ -17,7 +17,7 @@ if (MSVC)
         COMMAND ${CMAKE_COMMAND} -E copy ${_srcdir}/lib/win-${DEPS_ARCH}/libgmp-10.dll ${DESTDIR}/bin/
     )
 
-    add_custom_target(dep_GMP SOURCES ${_output})
+    add_custom_target(dep_GMP ALL DEPENDS ${_output})
 
 else ()
     set(_gmp_ccflags "-O2 -DNDEBUG -fPIC -DPIC -Wall -Wmissing-prototypes -Wpointer-arith -pedantic -fomit-frame-pointer -fno-common")

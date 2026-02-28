@@ -1,0 +1,58 @@
+name: Build all non linux
+
+on:
+  push:
+    branches:
+     - main
+     - release/*
+     - windows_build
+    paths:
+     - 'deps/**'
+     - 'src/**'
+     - '**/CMakeLists.txt'
+     - 'version.inc'
+     - 'localization/**'
+     - 'resources/**'
+     - ".github/workflows/build_*.yml"
+     - 'scripts/flatpak/**'
+
+  pull_request:
+    branches:
+     - main
+     - release/*
+    paths:
+     - 'deps/**'
+     - 'deps_src/**'
+     - 'src/**'
+     - '**/CMakeLists.txt'
+     - 'version.inc'
+     - ".github/workflows/build_*.yml"
+     - 'build_linux.sh'
+     - 'build_release_vs2022.bat'
+     - 'build_release_macos.sh'
+     - 'scripts/flatpak/**'
+     - 'resources/**'
+
+
+  workflow_dispatch: # allows for manual dispatch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+  
+jobs:
+  build_all:
+    name: Build Non-Linux
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+          - os: macos-14
+            arch: arm64
+    uses: ./.github/workflows/build_check_cache.yml
+    with:
+      os: ${{ matrix.os }}
+      arch: ${{ matrix.arch }}
+      build-deps-only: ${{ inputs.build-deps-only || false }}
+      force-build: ${{ github.event_name == 'schedule' }}
